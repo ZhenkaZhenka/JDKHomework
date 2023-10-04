@@ -17,7 +17,7 @@ public class ChatClient extends JFrame{
 
     protected static ChatServer cs;
 
-    private Component panTop, panMid, panBot;
+    protected Component panTop, panMid, panBot;
 
     public ChatClient() throws IOException {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -26,13 +26,16 @@ public class ChatClient extends JFrame{
         setTitle("ChatClient");
 
         cs = new ChatServer();
+        cs.cc = this;
 
         setPanTop();
         setPanMid();
         setPanBot();
 
         add(panTop, BorderLayout.NORTH);
-        add(panMid);
+        if(cs.getStatus()) {
+            add(panMid);
+        }
         add(panBot, BorderLayout.SOUTH);
 
         setVisible(true);

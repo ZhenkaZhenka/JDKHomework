@@ -16,6 +16,8 @@ public class ChatServer extends JFrame {
     private static final String LOGIN = "1111";
     private static final String PASSWORD = "1111";
 
+    protected ChatClient cc;
+
     private static final int WINDOW_HEIGHT = 100;
     private static final int WINDOW_WIDTH = 400;
     private static final int WINDOW_POSX = 100;
@@ -48,6 +50,7 @@ public class ChatServer extends JFrame {
                 if(!serverStatus) {
                     if (loginStatus) {
                         serverStatus = true;
+                        cc.add(cc.panMid);
                         System.out.println("Server turned on");
                     } else {
                         JOptionPane.showMessageDialog(ChatServer.this, "You haven't signed in");
