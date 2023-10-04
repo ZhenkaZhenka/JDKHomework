@@ -40,6 +40,12 @@ public class ChatServer extends JFrame {
 
         setVisible(true);
     }
+
+    /**
+     * Создание кнопок в окне работы с сервером. Если логирование не произошло, то
+     * сервер не запустится.
+     * @return Возвращает JPanel с кнопка вкл/выкл сервера
+     */
     private Component getButtons(){
         JPanel panButtons = new JPanel(new GridLayout(1,2));
         JButton btnStart = new JButton("Start server");
@@ -51,7 +57,8 @@ public class ChatServer extends JFrame {
                     if (loginStatus) {
                         serverStatus = true;
                         cc.add(cc.panMid);
-                        System.out.println("Server turned on");
+                        repaint();
+                        JOptionPane.showMessageDialog(ChatServer.this, "Server was turned on");
                     } else {
                         JOptionPane.showMessageDialog(ChatServer.this, "You haven't signed in");
                     }
@@ -68,7 +75,8 @@ public class ChatServer extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if(serverStatus) {
                     serverStatus = false;
-                    System.out.println("Server stopped");
+                    clearData();
+                    JOptionPane.showMessageDialog(ChatServer.this, "Server was stopped");
                 } else {
                     JOptionPane.showMessageDialog(ChatServer.this, "Server is already stopped");
                 }
@@ -79,6 +87,11 @@ public class ChatServer extends JFrame {
         return panButtons;
     }
 
+    /**
+     * Метод записи сообщения в файл
+     * @param text - текст из сообщения
+     * @throws IOException - появится, если файл не будет найден
+     */
     protected void sendTextIntoDatabase(String text) throws IOException {
         LocalDate ld = LocalDate.now();
         Date dt = new Date();
@@ -88,6 +101,12 @@ public class ChatServer extends JFrame {
             fr.append("\n");
         }
     }
+
+    /**
+     * Сборка текста из файла для добавления в чат
+     * @return Возвращает String значение с HTML-тегами для форматирования JLabel
+     * @throws IOException - появится, если файл не будет найден
+     */
     protected String getText() throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
@@ -109,5 +128,14 @@ public class ChatServer extends JFrame {
     }
     protected void setLogin(){
         loginStatus = true;
+    }
+
+    /**
+     * Отчистка данных после остановки работы сервера
+     */
+    private void clearData(){
+        cc.remove(cc.panMid);
+        cc.setPanTop();
+        cc.add(cc.panTop, BorderLayout.NORTH);
     }
 }

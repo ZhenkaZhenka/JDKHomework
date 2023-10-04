@@ -33,14 +33,15 @@ public class ChatClient extends JFrame{
         setPanBot();
 
         add(panTop, BorderLayout.NORTH);
-        if(cs.getStatus()) {
-            add(panMid);
-        }
         add(panBot, BorderLayout.SOUTH);
 
         setVisible(true);
     }
 
+    /**
+     * Создание меню логирования и обработчиков событий для него
+     * @return
+     */
     private Component getTopMenu(){
         JPanel jp = new JPanel(new GridLayout(1,3));
         JTable tab1 = new JTable(2,1);
@@ -67,20 +68,55 @@ public class ChatClient extends JFrame{
 
         return jp;
     }
+
+    /**
+     * Создание визуального отображения чата
+     * @return
+     * @throws IOException
+     */
     private Component getMiddleMenu() throws IOException {
         JLabel jl = new JLabel(cs.getText());
         jl.setVerticalAlignment(1);
         return jl;
     }
+
+    /**
+     * Создание меню ввода и отправки сообщения
+     * @return
+     */
     private Component getBottomMenu(){
         GridLayout gl = new GridLayout(1,2);
         JPanel pan = new JPanel(gl);
 
-        JTextArea ta = new JTextArea();
+        JTextArea ta = new JTextArea(0,20);
         ta.setLineWrap(true);
         ta.setWrapStyleWord(true);
 
         JButton btnSend = new JButton("Send");
+        ta.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                    try {
+                        cs.sendTextIntoDatabase(ta.getText());
+                        ta.setText("");
+                        update();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
         btnSend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -105,15 +141,15 @@ public class ChatClient extends JFrame{
         return pan;
     }
 
-    private void setPanTop() {
+    protected void setPanTop() {
         this.panTop = getTopMenu();
     }
 
-    private void setPanMid() throws IOException {
+    protected void setPanMid() throws IOException {
         this.panMid = getMiddleMenu();
     }
 
-    private void setPanBot() {
+    protected void setPanBot() {
         this.panBot = getBottomMenu();
     }
 
@@ -121,7 +157,6 @@ public class ChatClient extends JFrame{
         remove(panMid);
         setPanMid();
         add(panMid);
-        repaint();
     }
     private boolean checkLogin(String value){
         if(cs.getLogin().equals(value)){
@@ -135,7 +170,11 @@ public class ChatClient extends JFrame{
         }
         return false;
     }
-    private void setValuesOfTabs(JTable tab1, JTable tab2, String val1, String val2, String val3, String val4){
+
+    /**
+     * Метод добавления первоначальных значений в JTable
+     */
+    protected void setValuesOfTabs(JTable tab1, JTable tab2, String val1, String val2, String val3, String val4){
         tab1.setValueAt(val1, 0,0);
         tab1.setValueAt(val2, 1,0);
         tab2.setValueAt(val3, 0,0);
