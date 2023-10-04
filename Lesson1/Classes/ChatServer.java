@@ -5,9 +5,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.nio.file.Files;
+import java.sql.Time;
+import java.time.LocalDate;
+import java.util.Date;
 
 public class ChatServer extends JFrame {
-    private String path = "C:/Users/Евгений/Desktop/JDKHomework/Lesson1/Classes/Text.txt";
+    private String path = "./Lesson1/dataStorage.txt";
 
     private static final String LOGIN = "1111";
     private static final String PASSWORD = "1111";
@@ -17,13 +21,14 @@ public class ChatServer extends JFrame {
     private static final int WINDOW_POSX = 100;
     private static final int WINDOW_POSY = 100;
 
-    private boolean status = false;
+    private boolean loginStatus = false;
+    private boolean serverStatus = false;
 
     public Boolean getStatus(){
-        return status;
+        return serverStatus;
     }
 
-    ChatServer() throws IOException {
+    ChatServer(){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocation(WINDOW_POSX,WINDOW_POSY);
         setSize(WINDOW_WIDTH,WINDOW_HEIGHT);
@@ -40,8 +45,16 @@ public class ChatServer extends JFrame {
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = true;
-                System.out.println("Server turned on");
+                if(!serverStatus) {
+                    if (loginStatus) {
+                        serverStatus = true;
+                        System.out.println("Server turned on");
+                    } else {
+                        JOptionPane.showMessageDialog(ChatServer.this, "You haven't signed in");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(ChatServer.this, "Server is already turned on");
+                }
             }
         });
 
@@ -50,8 +63,12 @@ public class ChatServer extends JFrame {
         btnStop.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                status = false;
-                System.out.println("Server stopped");
+                if(serverStatus) {
+                    serverStatus = false;
+                    System.out.println("Server stopped");
+                } else {
+                    JOptionPane.showMessageDialog(ChatServer.this, "Server is already stopped");
+                }
             }
         });
         panButtons.add(btnStart);
@@ -60,11 +77,13 @@ public class ChatServer extends JFrame {
     }
 
     protected void sendTextIntoDatabase(String text) throws IOException {
+        LocalDate ld = LocalDate.now();
+        Date dt = new Date();
         try(FileWriter fr = new FileWriter(path, true)){
+            fr.append(ld.now() + "_" + dt.getHours() + ":" + dt.getMinutes() + " ");
             fr.append(text);
             fr.append("\n");
         }
-
     }
     protected String getText() throws IOException {
         StringBuilder sb = new StringBuilder();
@@ -84,5 +103,8 @@ public class ChatServer extends JFrame {
     }
     protected String getPassword(){
         return PASSWORD;
+    }
+    protected void setLogin(){
+        loginStatus = true;
     }
 }

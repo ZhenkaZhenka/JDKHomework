@@ -47,13 +47,14 @@ public class ChatClient extends JFrame{
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(checkLogin(tab1.getValueAt(1,0).toString())
-                        && checkPassword(tab2.getValueAt(1,0).toString())) {
-                    remove(panTop);
-                    repaint();
-                } else {
-                    JOptionPane.showMessageDialog(ChatClient.this,"Wrong login or password");
-                }
+                    if (checkLogin(tab1.getValueAt(1, 0).toString())
+                            && checkPassword(tab2.getValueAt(1, 0).toString())) {
+                        cs.setLogin();
+                        remove(panTop);
+                        repaint();
+                    } else {
+                        JOptionPane.showMessageDialog(ChatClient.this, "Wrong login or password");
+                    }
             }
         });
 
