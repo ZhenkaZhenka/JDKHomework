@@ -42,12 +42,13 @@ public class ChatClient extends JFrame{
         JPanel jp = new JPanel(new GridLayout(1,3));
         JTable tab1 = new JTable(2,1);
         JTable tab2 = new JTable(2,1);
+        setValuesOfTabs(tab1,tab2,"IP","LOGIN","PORT","PASSWORD");
         JButton btnLogin = new JButton("Login");
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(checkLogin(tab1.getValueAt(0,1).toString())
-                        && checkPassword(tab2.getValueAt(0,1).toString())) {
+                if(checkLogin(tab1.getValueAt(1,0).toString())
+                        && checkPassword(tab2.getValueAt(1,0).toString())) {
                     remove(panTop);
                     repaint();
                 } else {
@@ -129,5 +130,11 @@ public class ChatClient extends JFrame{
             return true;
         }
         return false;
+    }
+    private void setValuesOfTabs(JTable tab1, JTable tab2, String val1, String val2, String val3, String val4){
+        tab1.setValueAt(val1, 0,0);
+        tab1.setValueAt(val2, 1,0);
+        tab2.setValueAt(val3, 0,0);
+        tab2.setValueAt(val4, 1,0);
     }
 }
