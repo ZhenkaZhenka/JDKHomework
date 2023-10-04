@@ -75,6 +75,7 @@ public class ChatServer extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if(serverStatus) {
                     serverStatus = false;
+                    loginStatus = false;
                     clearData();
                     JOptionPane.showMessageDialog(ChatServer.this, "Server was stopped");
                 } else {

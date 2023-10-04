@@ -56,6 +56,7 @@ public class ChatClient extends JFrame{
                         cs.setLogin();
                         remove(panTop);
                         repaint();
+                        JOptionPane.showMessageDialog(ChatClient.this, "Log in successful");
                     } else {
                         JOptionPane.showMessageDialog(ChatClient.this, "Wrong login or password");
                     }
@@ -103,9 +104,14 @@ public class ChatClient extends JFrame{
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
                     try {
-                        cs.sendTextIntoDatabase(ta.getText());
-                        ta.setText("");
-                        update();
+                        if(cs.getStatus()) {
+                            cs.sendTextIntoDatabase(ta.getText());
+                            ta.setText(null);
+                            System.out.println("Сообщение отправлено");
+                            update();
+                        } else {
+                            JOptionPane.showMessageDialog(ChatClient.this,"Server is stopped, you can't send messages");
+                        }
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -127,7 +133,7 @@ public class ChatClient extends JFrame{
                         update();
                     }
                     else{
-                        JOptionPane.showMessageDialog(cs,"Server is stopped");
+                        JOptionPane.showMessageDialog(ChatClient.this,"Server is stopped, you can't send messages");
                     }
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
@@ -157,6 +163,7 @@ public class ChatClient extends JFrame{
         remove(panMid);
         setPanMid();
         add(panMid);
+        repaint();
     }
     private boolean checkLogin(String value){
         if(cs.getLogin().equals(value)){
