@@ -1,12 +1,12 @@
-package Classes;
+package Server;
+
+import Client.ChatClient;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.nio.file.Files;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -58,7 +58,7 @@ public class ChatServer extends JFrame {
                 if(!serverStatus) {
                     if (loginStatus) {
                         serverStatus = true;
-                        cc.add(cc.log);
+                        cc.add(cc.getLog());
                         repaint();
                         JOptionPane.showMessageDialog(ChatServer.this, "Server was turned on");
                     } else {
@@ -95,7 +95,7 @@ public class ChatServer extends JFrame {
      * @param text - текст из сообщения
      * @throws IOException - появится, если файл не будет найден
      */
-    protected void sendTextIntoDatabase(String text) throws IOException {
+    public void sendTextIntoDatabase(String text) throws IOException {
         LocalDate ld = LocalDate.now();
         Date dt = new Date();
         try(FileWriter fr = new FileWriter(path, true)){
@@ -110,7 +110,7 @@ public class ChatServer extends JFrame {
      * @return Возвращает String значение с HTML-тегами для форматирования JLabel
      * @throws IOException - появится, если файл не будет найден
      */
-    protected String getText() throws IOException {
+    public String getText() throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("<html>");
         try(BufferedReader br = new BufferedReader(new FileReader(path))){
@@ -123,13 +123,13 @@ public class ChatServer extends JFrame {
         sb.append("<html>");
         return sb.toString();
     }
-    protected String getLogin(){
+    public String getLogin(){
         return LOGIN;
     }
-    protected String getPassword(){
+    public String getPassword(){
         return PASSWORD;
     }
-    protected void setLogin(){
+    public void setLogin(){
         loginStatus = true;
     }
 
@@ -137,8 +137,8 @@ public class ChatServer extends JFrame {
      * Отчистка данных после остановки работы сервера
      */
     private void clearData(){
-        cc.remove(cc.log);
+        cc.remove(cc.getLog());
         cc.getFooter();
-        cc.add(cc.header, BorderLayout.NORTH);
+        cc.add(cc.getHeader(), BorderLayout.NORTH);
     }
 }

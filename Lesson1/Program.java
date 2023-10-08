@@ -1,5 +1,5 @@
 
-import Classes.ChatServer;
+import Server.ChatServer;
 
 import java.io.IOException;
 

@@ -1,13 +1,11 @@
-package Classes;
+package Client;
+
+import Server.ChatServer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class ChatClient extends JFrame{
     private static final int WINDOW_HEIGHT = 400;
@@ -17,7 +15,7 @@ public class ChatClient extends JFrame{
 
     protected static ChatServer cs;
 
-    protected Component header, log, footer;
+    private Component header, log, footer;
 
     public ChatClient(ChatServer chatServer) throws IOException {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -27,9 +25,9 @@ public class ChatClient extends JFrame{
 
         cs = chatServer;
 
-        getHeader();
-        getLog();
-        getFooter();
+        createHeader();
+        createLog();
+        createFooter();
 
         add(header, BorderLayout.NORTH);
         add(footer, BorderLayout.SOUTH);
@@ -41,7 +39,7 @@ public class ChatClient extends JFrame{
      * Создание меню логирования и обработчиков событий для него
      * @return
      */
-    private void getHeader(){
+    private void createHeader(){
         JPanel jp = new JPanel(new GridLayout(1,3));
         JTable tab1 = new JTable(2,1);
         JTable tab2 = new JTable(2,1);
@@ -74,7 +72,7 @@ public class ChatClient extends JFrame{
      * @return
      * @throws IOException
      */
-    private void getLog() throws IOException {
+    private void createLog() throws IOException {
         JLabel jl = new JLabel(cs.getText());
         jl.setVerticalAlignment(1);
         log = jl;
@@ -84,7 +82,7 @@ public class ChatClient extends JFrame{
      * Создание меню ввода и отправки сообщения
      * @return
      */
-    void getFooter(){
+    void createFooter(){
         GridLayout gl = new GridLayout(1,2);
         JPanel footer = new JPanel(gl);
 
@@ -137,7 +135,7 @@ public class ChatClient extends JFrame{
     }
     private void update() throws IOException {
         this.remove(log);
-        getLog();
+        createLog();
         this.add(log);
         repaint();
     }
@@ -162,5 +160,14 @@ public class ChatClient extends JFrame{
         tab1.setValueAt(val2, 1,0);
         tab2.setValueAt(val3, 0,0);
         tab2.setValueAt(val4, 1,0);
+    }
+    public Component getHeader(){
+        return header;
+    }
+    public Component getLog(){
+        return log;
+    }
+    public Component getFooter(){
+        return footer;
     }
 }
