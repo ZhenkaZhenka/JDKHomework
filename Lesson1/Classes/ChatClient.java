@@ -17,23 +17,22 @@ public class ChatClient extends JFrame{
 
     protected static ChatServer cs;
 
-    protected Component panTop, panMid, panBot;
+    protected Component header, log, footer;
 
-    public ChatClient() throws IOException {
+    public ChatClient(ChatServer chatServer) throws IOException {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocation(WINDOW_POSX,WINDOW_POSY);
         setSize(WINDOW_WIDTH,WINDOW_HEIGHT);
         setTitle("ChatClient");
 
-        cs = new ChatServer();
-        cs.cc = this;
+        cs = chatServer;
 
-        setPanTop();
-        setPanMid();
-        setPanBot();
+        getHeader();
+        getLog();
+        getFooter();
 
-        add(panTop, BorderLayout.NORTH);
-        add(panBot, BorderLayout.SOUTH);
+        add(header, BorderLayout.NORTH);
+        add(footer, BorderLayout.SOUTH);
 
         setVisible(true);
     }
@@ -42,11 +41,11 @@ public class ChatClient extends JFrame{
      * Создание меню логирования и обработчиков событий для него
      * @return
      */
-    private Component getTopMenu(){
+    private void getHeader(){
         JPanel jp = new JPanel(new GridLayout(1,3));
         JTable tab1 = new JTable(2,1);
         JTable tab2 = new JTable(2,1);
-        setValuesOfTabs(tab1,tab2,"IP","LOGIN","PORT","PASSWORD");
+        setValuesOfTabs(tab1,tab2,"IP","1111","PORT","1111");
         JButton btnLogin = new JButton("Login");
         btnLogin.addActionListener(new ActionListener() {
             @Override
@@ -54,7 +53,7 @@ public class ChatClient extends JFrame{
                     if (checkLogin(tab1.getValueAt(1, 0).toString())
                             && checkPassword(tab2.getValueAt(1, 0).toString())) {
                         cs.setLogin();
-                        remove(panTop);
+                        remove(header);
                         repaint();
                         JOptionPane.showMessageDialog(ChatClient.this, "Log in successful");
                     } else {
@@ -67,7 +66,7 @@ public class ChatClient extends JFrame{
         jp.add(tab2);
         jp.add(btnLogin);
 
-        return jp;
+        header = jp;
     }
 
     /**
@@ -75,23 +74,21 @@ public class ChatClient extends JFrame{
      * @return
      * @throws IOException
      */
-    private Component getMiddleMenu() throws IOException {
+    private void getLog() throws IOException {
         JLabel jl = new JLabel(cs.getText());
         jl.setVerticalAlignment(1);
-        return jl;
+        log = jl;
     }
 
     /**
      * Создание меню ввода и отправки сообщения
      * @return
      */
-    private Component getBottomMenu(){
+    void getFooter(){
         GridLayout gl = new GridLayout(1,2);
-        JPanel pan = new JPanel(gl);
+        JPanel footer = new JPanel(gl);
 
-        JTextArea ta = new JTextArea(0,20);
-        ta.setLineWrap(true);
-        ta.setWrapStyleWord(true);
+        JTextField ta = new JTextField();
 
         JButton btnSend = new JButton("Send");
         ta.addKeyListener(new KeyListener() {
@@ -103,18 +100,7 @@ public class ChatClient extends JFrame{
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    try {
-                        if(cs.getStatus()) {
-                            cs.sendTextIntoDatabase(ta.getText());
-                            ta.setText(null);
-                            System.out.println("Сообщение отправлено");
-                            update();
-                        } else {
-                            JOptionPane.showMessageDialog(ChatClient.this,"Server is stopped, you can't send messages");
-                        }
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
+                    sendMessage(ta);
                 }
             }
 
@@ -126,43 +112,33 @@ public class ChatClient extends JFrame{
         btnSend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    if(cs.getStatus()) {
-                        cs.sendTextIntoDatabase(ta.getText());
-                        System.out.println("Сообщение отправлено");
-                        update();
-                    }
-                    else{
-                        JOptionPane.showMessageDialog(ChatClient.this,"Server is stopped, you can't send messages");
-                    }
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-                ta.setText("");
+                sendMessage(ta);
             }
         });
 
-        pan.add(ta);
-        pan.add(btnSend);
-        return pan;
+        footer.add(ta);
+        footer.add(btnSend);
+        this.footer = footer;
     }
-
-    protected void setPanTop() {
-        this.panTop = getTopMenu();
+    private void sendMessage(JTextField ta){
+        try {
+            if(cs.getStatus()) {
+                cs.sendTextIntoDatabase(ta.getText());
+                ta.setText(null);
+                System.out.println("Сообщение отправлено");
+                update();
+                repaint();
+            } else {
+                JOptionPane.showMessageDialog(ChatClient.this,"Server is stopped, you can't send messages");
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
-
-    protected void setPanMid() throws IOException {
-        this.panMid = getMiddleMenu();
-    }
-
-    protected void setPanBot() {
-        this.panBot = getBottomMenu();
-    }
-
     private void update() throws IOException {
-        remove(panMid);
-        setPanMid();
-        add(panMid);
+        this.remove(log);
+        getLog();
+        this.add(log);
         repaint();
     }
     private boolean checkLogin(String value){

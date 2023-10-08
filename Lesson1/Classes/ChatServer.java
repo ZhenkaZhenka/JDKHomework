@@ -30,11 +30,13 @@ public class ChatServer extends JFrame {
         return serverStatus;
     }
 
-    ChatServer(){
+    public ChatServer() throws IOException {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocation(WINDOW_POSX,WINDOW_POSY);
         setSize(WINDOW_WIDTH,WINDOW_HEIGHT);
         setTitle("ChatServer");
+
+        cc = new ChatClient(this);
 
         add(getButtons());
 
@@ -44,7 +46,7 @@ public class ChatServer extends JFrame {
     /**
      * Создание кнопок в окне работы с сервером. Если логирование не произошло, то
      * сервер не запустится.
-     * @return Возвращает JPanel с кнопка вкл/выкл сервера
+     * @return Возвращает JPanel с кнопками вкл/выкл сервера
      */
     private Component getButtons(){
         JPanel panButtons = new JPanel(new GridLayout(1,2));
@@ -56,7 +58,7 @@ public class ChatServer extends JFrame {
                 if(!serverStatus) {
                     if (loginStatus) {
                         serverStatus = true;
-                        cc.add(cc.panMid);
+                        cc.add(cc.log);
                         repaint();
                         JOptionPane.showMessageDialog(ChatServer.this, "Server was turned on");
                     } else {
@@ -135,8 +137,8 @@ public class ChatServer extends JFrame {
      * Отчистка данных после остановки работы сервера
      */
     private void clearData(){
-        cc.remove(cc.panMid);
-        cc.setPanTop();
-        cc.add(cc.panTop, BorderLayout.NORTH);
+        cc.remove(cc.log);
+        cc.getFooter();
+        cc.add(cc.header, BorderLayout.NORTH);
     }
 }
