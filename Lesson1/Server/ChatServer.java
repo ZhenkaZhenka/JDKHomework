@@ -1,6 +1,6 @@
 package Server;
 
-import Client.ChatClient;
+import Client.ClientGUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +16,7 @@ public class ChatServer extends JFrame {
     private static final String LOGIN = "1111";
     private static final String PASSWORD = "1111";
 
-    protected ChatClient cc;
+    protected ClientGUI cc;
 
     private static final int WINDOW_HEIGHT = 100;
     private static final int WINDOW_WIDTH = 400;
@@ -36,7 +36,7 @@ public class ChatServer extends JFrame {
         setSize(WINDOW_WIDTH,WINDOW_HEIGHT);
         setTitle("ChatServer");
 
-        cc = new ChatClient(this);
+        cc = new ClientGUI(this);
 
         add(getButtons());
 
@@ -56,7 +56,7 @@ public class ChatServer extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(!serverStatus) {
-                    if (loginStatus) {
+                    if (cc.getClient().isConnected()) {
                         serverStatus = true;
                         cc.add(cc.getLog());
                         repaint();
@@ -79,6 +79,7 @@ public class ChatServer extends JFrame {
                     serverStatus = false;
                     loginStatus = false;
                     clearData();
+                    cc.getClient().disconnectFromServer();
                     JOptionPane.showMessageDialog(ChatServer.this, "Server was stopped");
                 } else {
                     JOptionPane.showMessageDialog(ChatServer.this, "Server is already stopped");
@@ -99,7 +100,7 @@ public class ChatServer extends JFrame {
         LocalDate ld = LocalDate.now();
         Date dt = new Date();
         try(FileWriter fr = new FileWriter(path, true)){
-            fr.append(ld.now() + "_" + dt.getHours() + ":" + dt.getMinutes() + " ");
+            fr.append(dt.getHours() + ":" + dt.getMinutes() + " " + cc.getClient().getName() + ":");
             fr.append(text);
             fr.append("\n");
         }
@@ -128,9 +129,6 @@ public class ChatServer extends JFrame {
     }
     public String getPassword(){
         return PASSWORD;
-    }
-    public void setLogin(){
-        loginStatus = true;
     }
 
     /**

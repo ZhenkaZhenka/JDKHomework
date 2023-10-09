@@ -7,23 +7,29 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 
-public class ChatClient extends JFrame{
+public class ClientGUI extends JFrame{
     private static final int WINDOW_HEIGHT = 400;
     public static final int WINDOW_WIDTH = 400;
     public static final int WINDOW_POSX = 500;
     public static final int WINDOW_POSY = 100;
 
     protected static ChatServer cs;
+    private Client client;
 
-    private Component header, log, footer;
+    private JButton btnSend, btnLogin;
+    private JTextField messageField;
+    private JTable tab1, tab2;
 
-    public ChatClient(ChatServer chatServer) throws IOException {
+    public Component header, log, footer;
+
+    public ClientGUI(ChatServer chatServer) throws IOException {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocation(WINDOW_POSX,WINDOW_POSY);
         setSize(WINDOW_WIDTH,WINDOW_HEIGHT);
         setTitle("ChatClient");
 
         cs = chatServer;
+        client = new Client(this, cs);
 
         createHeader();
         createLog();
@@ -41,22 +47,14 @@ public class ChatClient extends JFrame{
      */
     private void createHeader(){
         JPanel jp = new JPanel(new GridLayout(1,3));
-        JTable tab1 = new JTable(2,1);
-        JTable tab2 = new JTable(2,1);
+        tab1 = new JTable(2,1);
+        tab2 = new JTable(2,1);
         setValuesOfTabs(tab1,tab2,"IP","1111","PORT","1111");
-        JButton btnLogin = new JButton("Login");
+        btnLogin = new JButton("Login");
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                    if (checkLogin(tab1.getValueAt(1, 0).toString())
-                            && checkPassword(tab2.getValueAt(1, 0).toString())) {
-                        cs.setLogin();
-                        remove(header);
-                        repaint();
-                        JOptionPane.showMessageDialog(ChatClient.this, "Log in successful");
-                    } else {
-                        JOptionPane.showMessageDialog(ChatClient.this, "Wrong login or password");
-                    }
+                    client.connectToServer();
             }
         });
 
@@ -86,10 +84,10 @@ public class ChatClient extends JFrame{
         GridLayout gl = new GridLayout(1,2);
         JPanel footer = new JPanel(gl);
 
-        JTextField ta = new JTextField();
+        messageField = new JTextField();
 
-        JButton btnSend = new JButton("Send");
-        ta.addKeyListener(new KeyListener() {
+        btnSend = new JButton("Send");
+        messageField.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
 
@@ -98,7 +96,7 @@ public class ChatClient extends JFrame{
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER){
-                    sendMessage(ta);
+                    client.sendMessage(messageField);
                 }
             }
 
@@ -110,42 +108,28 @@ public class ChatClient extends JFrame{
         btnSend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                sendMessage(ta);
+                client.sendMessage(messageField);
             }
         });
 
-        footer.add(ta);
+        footer.add(messageField);
         footer.add(btnSend);
         this.footer = footer;
     }
-    private void sendMessage(JTextField ta){
-        try {
-            if(cs.getStatus()) {
-                cs.sendTextIntoDatabase(ta.getText());
-                ta.setText(null);
-                System.out.println("Сообщение отправлено");
-                update();
-                repaint();
-            } else {
-                JOptionPane.showMessageDialog(ChatClient.this,"Server is stopped, you can't send messages");
-            }
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-    private void update() throws IOException {
+
+    void update() throws IOException {
         this.remove(log);
         createLog();
         this.add(log);
         repaint();
     }
-    private boolean checkLogin(String value){
+    protected boolean checkLogin(String value){
         if(cs.getLogin().equals(value)){
             return true;
         }
         return false;
     }
-    private boolean checkPassword(String value){
+    protected boolean checkPassword(String value){
         if(cs.getPassword().equals(value)){
             return true;
         }
@@ -169,5 +153,33 @@ public class ChatClient extends JFrame{
     }
     public Component getFooter(){
         return footer;
+    }
+
+    public static ChatServer getCs() {
+        return cs;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public JButton getBtnSend() {
+        return btnSend;
+    }
+
+    public JButton getBtnLogin() {
+        return btnLogin;
+    }
+
+    public JTextField getMessageField() {
+        return messageField;
+    }
+
+    public JTable getTab1() {
+        return tab1;
+    }
+
+    public JTable getTab2() {
+        return tab2;
     }
 }
