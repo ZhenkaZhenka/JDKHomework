@@ -35,7 +35,7 @@ public class Client implements ClientView{
         try {
             if(chatServer.getStatus()) {
                 if(isConnected()) {
-                    chatServer.sendTextIntoDatabase(ta.getText());
+                    chatServer.getHistory().sendTextIntoDatabase(ta.getText(), name);
                     ta.setText(null);
                     System.out.println("Сообщение отправлено");
                     clientGUI.update();

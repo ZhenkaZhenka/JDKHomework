@@ -1,14 +1,14 @@
 package Server;
 
 import Client.ClientGUI;
+import Client.Client;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.time.LocalDate;
-import java.util.Date;
+import java.util.ArrayList;
 
 public class ChatServer extends JFrame {
     private String path = "./Lesson1/dataStorage.txt";
@@ -16,15 +16,17 @@ public class ChatServer extends JFrame {
     private static final String LOGIN = "1111";
     private static final String PASSWORD = "1111";
 
-    protected ClientGUI cc;
+    protected ClientGUI chatClient;
+    private History history;
 
     private static final int WINDOW_HEIGHT = 100;
     private static final int WINDOW_WIDTH = 400;
     private static final int WINDOW_POSX = 100;
     private static final int WINDOW_POSY = 100;
 
-    private boolean loginStatus = false;
     private boolean serverStatus = false;
+
+    private ArrayList<Client> clients;
 
     public Boolean getStatus(){
         return serverStatus;
@@ -36,7 +38,8 @@ public class ChatServer extends JFrame {
         setSize(WINDOW_WIDTH,WINDOW_HEIGHT);
         setTitle("ChatServer");
 
-        cc = new ClientGUI(this);
+        history = new History(path);
+        chatClient = new ClientGUI(this);
 
         add(getButtons());
 
@@ -56,9 +59,9 @@ public class ChatServer extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(!serverStatus) {
-                    if (cc.getClient().isConnected()) {
+                    if (chatClient.getClient().isConnected()) {
                         serverStatus = true;
-                        cc.add(cc.getLog());
+                        chatClient.add(chatClient.getLog());
                         repaint();
                         JOptionPane.showMessageDialog(ChatServer.this, "Server was turned on");
                     } else {
@@ -77,9 +80,8 @@ public class ChatServer extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if(serverStatus) {
                     serverStatus = false;
-                    loginStatus = false;
-                    clearData();
-                    cc.getClient().disconnectFromServer();
+                    chatClient.clearData();
+                    chatClient.getClient().disconnectFromServer();
                     JOptionPane.showMessageDialog(ChatServer.this, "Server was stopped");
                 } else {
                     JOptionPane.showMessageDialog(ChatServer.this, "Server is already stopped");
@@ -90,40 +92,6 @@ public class ChatServer extends JFrame {
         panButtons.add(btnStop);
         return panButtons;
     }
-
-    /**
-     * Метод записи сообщения в файл
-     * @param text - текст из сообщения
-     * @throws IOException - появится, если файл не будет найден
-     */
-    public void sendTextIntoDatabase(String text) throws IOException {
-        LocalDate ld = LocalDate.now();
-        Date dt = new Date();
-        try(FileWriter fr = new FileWriter(path, true)){
-            fr.append(dt.getHours() + ":" + dt.getMinutes() + " " + cc.getClient().getName() + ":");
-            fr.append(text);
-            fr.append("\n");
-        }
-    }
-
-    /**
-     * Сборка текста из файла для добавления в чат
-     * @return Возвращает String значение с HTML-тегами для форматирования JLabel
-     * @throws IOException - появится, если файл не будет найден
-     */
-    public String getText() throws IOException {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html>");
-        try(BufferedReader br = new BufferedReader(new FileReader(path))){
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-                sb.append("<br>");
-            }
-        }
-        sb.append("<html>");
-        return sb.toString();
-    }
     public String getLogin(){
         return LOGIN;
     }
@@ -131,12 +99,11 @@ public class ChatServer extends JFrame {
         return PASSWORD;
     }
 
-    /**
-     * Отчистка данных после остановки работы сервера
-     */
-    private void clearData(){
-        cc.remove(cc.getLog());
-        cc.getFooter();
-        cc.add(cc.getHeader(), BorderLayout.NORTH);
+    public History getHistory() {
+        return history;
+    }
+
+    public void setHistory(History history) {
+        this.history = history;
     }
 }

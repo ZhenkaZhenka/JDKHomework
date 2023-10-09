@@ -71,7 +71,7 @@ public class ClientGUI extends JFrame{
      * @throws IOException
      */
     private void createLog() throws IOException {
-        JLabel jl = new JLabel(cs.getText());
+        JLabel jl = new JLabel(cs.getHistory().getText());
         jl.setVerticalAlignment(1);
         log = jl;
     }
@@ -153,6 +153,14 @@ public class ClientGUI extends JFrame{
     }
     public Component getFooter(){
         return footer;
+    }
+    /**
+     * Отчистка данных после остановки работы сервера
+     */
+    public void clearData(){
+        remove(getLog());
+        getFooter();
+        add(getHeader(), BorderLayout.NORTH);
     }
 
     public static ChatServer getCs() {
